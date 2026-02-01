@@ -38,8 +38,6 @@ def getJson(url):
 
 # 봇의 고유 식별 키(Token)입니다. (주의: 절대로 외부에 노출되면 안 됩니다!)
 token = "MTQ2NzUwNjk0ODU3NTMzNDUyMQ.GuV5Zu.XDSKffeI9ykFYST1VwwDNiKaJoXvUTc3hlXuMA"
-# 특정 채널의 ID입니다. (현재 코드 내에서는 정의만 되어 있고 실제 사용되지는 않고 있습니다.)
-channel_id = "1467522920891814048"
 
 # 봇의 권한(Intents)을 설정합니다. 기본 설정(default)을 사용합니다.
 intents = discord.Intents.default()
