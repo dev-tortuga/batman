@@ -35,7 +35,7 @@ tree = app_commands.CommandTree(client)
 
 #functions
 def getYesterday():
-    today = datetime.now()
+    today = datetime.now() # today로 썼는데 나중에 12시 자동으로 뿌리게 하기 위해서 time_now 같은 변수명으로 바꾸는게 좋을듯
     yesterday = today - timedelta(days=1)
     
     return yesterday.strftime('%Y-%m-%d')
@@ -49,6 +49,27 @@ def getJson(url):
         data = {"error":"ERROR: " + str(response.status_code) + " 오류 발생"}
     
     return data
+
+
+
+#functions and initialize for kordle
+#------------------------------------
+
+kordle_start_date = datetime(2022, 1, 1) #꼬들 단어리스트 첫 정답 날짜
+
+#open kordle_answers.txt
+with open('./resources/answers/kordle_answers.txt', 'r', encoding='utf-8') as f:
+    kordle_answers = [line.strip() for line in f.readlines() if line.strip()] #list comprehension이라는 방식이라네요 잘은 모르겠음
+
+#calculate yesterday kordle index
+def calculateKordleAnswer():
+    yesterday_datetime = datetime.strptime(getYesterday(),'%Y-%m-%d') #datetime을 문자열로 변환했다 다시 datetime객체로 변환중..... 위에서 수정해야 할듯 
+    kordleAnswer_index = (yesterday_datetime - kordle_start_date).days #시작 날짜 - 어제날짜 = 꼬들 답 인덱스(줄 번호)
+    
+    kordle_finalAnswer = kordle_answers[kordleAnswer_index] 
+    return kordle_finalAnswer
+
+#------------------------------------
 
 
 
@@ -77,6 +98,24 @@ async def wordleAnswer(interaction: discord.Interaction):
 
     await interaction.response.send_message(final_message)
     
+
+# Kordle 정답 가져오는 명령어
+@tree.command(name="꼬들정답", description="전날 꼬들 정답을 가져옵니다.")
+async def sendYesterdaykordleAnswer(interaction: discord.Interaction):
+
+    answer_date = getYesterday()
+
+    kordle_answer = ""
+    final_message = ""
+    
+    try:
+        kordle_answer = calculateKordleAnswer()
+        final_message = f"**{answer_date}**의 꼬들 정답은 _{kordle_answer}_입니다."
+    except:
+        final_message = 'error'
+
+    await interaction.response.send_message(final_message)
+
 
 
 #bot startup
