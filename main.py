@@ -52,6 +52,7 @@ def getJson(url):
 
 
 
+
 #functions and initialize for kordle
 #------------------------------------
 
@@ -83,7 +84,6 @@ async def hello(interaction: discord.Interaction):
 # Wordle 전날 정답 가져오는 함수
 @tree.command(name="워들정답", description="전날 워들 정답을 가져옵니다.")
 async def wordleAnswer(interaction: discord.Interaction):
-    
     answer_date = getYesterday()
     wordle_json_url = "https://www.nytimes.com/svc/wordle/v2/" + answer_date + ".json"
     wordle_json = getJson(wordle_json_url)
@@ -98,6 +98,39 @@ async def wordleAnswer(interaction: discord.Interaction):
 
     await interaction.response.send_message(final_message)
     
+    
+# Wordle 특정 날짜 정답
+@tree.command(name="워들정답날짜", description="특정 날짜의 워들 정답을 가져옵니다.")
+@app_commands.describe(target_date = "MM-DD 형식으로 입력 (예: 01-12)")
+@app_commands.rename(target_date = "날짜")
+async def dateWordleAnswer(interaction: discord.Interaction, target_date: str): #typehint
+    
+    current_year = datetime.today().strftime('%Y') #해당 연도 문자열 반환
+    
+    wordle_answer = ""
+    final_message = ""
+    
+    #입력 target_date의 유효성 검사
+    try:
+        target_date = datetime.strptime(f"{current_year}-{target_date}", '%Y-%m-%d') #current_year + '-' + targetdate 를 datetime으로 변환
+    except ValueError:
+        final_message = "오류: 올바르지 않은 형식입니다. (올바른 예: 01-12)"
+        await interaction.response.send_message(final_message)
+        return # 함수 종료
+
+    target_date = datetime.strftime(target_date, '%Y-%m-%d')
+    
+    wordle_json_url = "https://www.nytimes.com/svc/wordle/v2/" + target_date + ".json"
+    wordle_json = getJson(wordle_json_url)
+    
+
+    try:
+        wordle_answer = wordle_json['solution'].upper()
+        final_message = f"**{target_date}**의 워들 정답은 _{wordle_answer}_입니다."
+    except:
+        final_message = wordle_json['error']
+
+    await interaction.response.send_message(final_message)
 
 # Kordle 정답 가져오는 명령어
 @tree.command(name="꼬들정답", description="전날 꼬들 정답을 가져옵니다.")
