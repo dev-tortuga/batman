@@ -1,0 +1,6 @@
+discord.py
+datetime
+requests
+os
+python-dotenv
+aiohttp
