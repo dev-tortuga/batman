@@ -51,6 +51,17 @@ async def ping_self():
       pass
     await asyncio.sleep(180)
 
+async def notice_server_cond():
+
+    channel_id = int(os.environ['SERVER_COND_ID'])
+    channel = client.get_channel(channel_id)
+
+    if channel:
+        await channel.send("batman online.")
+    else:
+        print("batman calling failed...")
+   
+
 # 환경변수 호출 및 토큰 등록
 load_dotenv()
 token = os.environ['DISCORD_TOKEN']
@@ -198,8 +209,10 @@ async def on_ready():
     # 작성한 슬래시 명령어들을 디스코드 서버에 동기화(업데이트)합니다.
     # 이 과정이 있어야 디스코드 채팅창에 /인사 가 나타납니다.
     await tree.sync()
+    await notice_server_cond() # batmobile의 서버-상태 채널에 봇 기동 알림
     print(f"봇이 {client.user} 상태로 로그인되었습니다.") # 로그 출력을 추가하면 확인이 쉽습니다.
-    client.loop.create_task(ping_self())
+    client.loop.create_task(start_web_server()) # 웹 서버 기동
+    client.loop.create_task(ping_self()) # 서버를 깨우기 위한 함수 반복 호출
 
 # 설정한 토큰을 사용하여 봇을 실제로 실행합니다.
 client.run(token)
