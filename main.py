@@ -1,5 +1,5 @@
 '''
-이거 지울건가요
+일단냅두자
 def deco(fn):
     def deco_hello():
         print("=" * 20)
@@ -25,6 +25,7 @@ from dotenv import load_dotenv
 import aiohttp
 from aiohttp import web
 
+import asyncio
 
 #initialize
 
@@ -34,11 +35,21 @@ async def health_check(request):
 
 async def start_web_server():
   app = web.Application()
-  app.router.add_get('/health', health_check) # Health Check API 추가
+  app.router.add_get('/bathealth', health_check) # Health Check API 추가
   runner = web.AppRunner(app)
   await runner.setup()
   site = web.TCPSite(runner, '0.0.0.0', 8000)
   await site.start()
+
+async def ping_self():
+  await client.wait_until_ready()
+  while not client.is_closed():
+    try:
+      async with aiohttp.ClientSession() as s:
+        await s.get(os.environ['KOYEP_URL'])
+    except:
+      pass
+    await asyncio.sleep(180)
 
 # 환경변수 호출 및 토큰 등록
 load_dotenv()
@@ -96,7 +107,14 @@ def calculateKordleAnswer():
 
 
 
-# Commands 
+# Commands
+
+# 디버깅 명령어
+@tree.command(name="call-batman", description="batman 호출")
+async def call_batman(interaction: discord.Interaction):
+    # call-batman 명령어로 batman 봇이 제대로 활성화되었는지 확인
+    await interaction.response.send_message("batman is here.")
+
 # '/인사'라는 이름의 슬래시 명령어를 정의합니다.
 @tree.command(name="인사", description="인사 하기")
 async def hello(interaction: discord.Interaction):
@@ -181,6 +199,7 @@ async def on_ready():
     # 이 과정이 있어야 디스코드 채팅창에 /인사 가 나타납니다.
     await tree.sync()
     print(f"봇이 {client.user} 상태로 로그인되었습니다.") # 로그 출력을 추가하면 확인이 쉽습니다.
+    client.loop.create_task(ping_self())
 
 # 설정한 토큰을 사용하여 봇을 실제로 실행합니다.
 client.run(token)
