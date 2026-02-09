@@ -16,7 +16,7 @@ hello()
 
 import discord  # 디스코드 API를 사용하기 위한 메인 라이브러리를 불러옵니다.
 from discord import app_commands  # 슬래시 명령어(예: /인사)를 관리하기 위한 모듈을 불러옵니다.
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import requests
 
 import os
@@ -75,11 +75,12 @@ client = discord.Client(intents=intents)
 # 슬래시 명령어를 봇에 연결해 주는 '명령어 트리'를 생성합니다.
 tree = app_commands.CommandTree(client)
 
-
+#한국 시간 계산용
+KST = timezone(timedelta(hours=9)) #UTC+9 
 
 #functions
-def getYesterday():
-    today = datetime.now() # today로 썼는데 나중에 12시 자동으로 뿌리게 하기 위해서 time_now 같은 변수명으로 바꾸는게 좋을듯
+def getYesterday():      #KST 추가
+    today = datetime.now(KST)# today로 썼는데 나중에 12시 자동으로 뿌리게 하기 위해서 time_now 같은 변수명으로 바꾸는게 좋을듯
     yesterday = today - timedelta(days=1)
     
     return yesterday.strftime('%Y-%m-%d')
